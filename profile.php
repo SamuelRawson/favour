@@ -130,10 +130,7 @@ $conn->close();
             <a class="nav-link active" href="student.php">Dashboard</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="create-event.php">Create Event</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="manage-events.php">Manage Events</a>
+            <a class="nav-link" href="viewevent.php">View Event</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="profile.php">Profile</a>

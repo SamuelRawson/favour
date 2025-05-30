@@ -93,9 +93,6 @@ $events_result = $stmt->get_result();
             <a class="nav-link active" href="viewevent.php">View Event</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="manage-events.php">Manage Events</a>
-          </li>
-          <li class="nav-item">
             <a class="nav-link" href="profile.php">Profile</a>
           </li>
         </ul>
@@ -107,7 +104,7 @@ $events_result = $stmt->get_result();
   <!-- Dashboard Header -->
   <div class="container">
     <div class="dashboard-header">
-      <h2>Welcome to Your Dashboard</h2>
+      <h2>Welcome to Your Event centre</h2>
       <p class="text-muted">Here are your upcoming events</p>
     </div>
 
