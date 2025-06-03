@@ -69,20 +69,17 @@ if (!isset($_SESSION['email']) && !isset($_SESSION['matric'])) {
   <!-- Navigation Bar -->
   <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container">
-      <a class="navbar-brand" href="dashboard.php">Campus Events</a>
+      <a class="navbar-brand" href="student.php">Campus Events</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
         <ul class="navbar-nav me-3">
           <li class="nav-item">
-            <a class="nav-link active" href="dashboard.php">Dashboard</a>
+            <a class="nav-link active" href="student.php">Dashboard</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="viewevent.php">View Event</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="manage-events.php">Manage Events</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="profile.php">Profile</a>

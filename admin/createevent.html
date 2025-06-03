@@ -61,14 +61,17 @@
   <div class="sidebar">
     <h4 class="text-center mb-4">Admin Panel</h4>
     <a href="dashboard.php" >Dashboard</a>
-    <a href="manageuser.php" class="active">Manage users</a>
-    <a href="#">Manage Events</a>
-    <a href="#">Registered Users</a>
+    <a href="manageuser.php">Manage users</a>
+    <a href="manageevent.php">Manage Events</a>
     <a href="createevent.html" class="active">Create Event</a>
-    <a href="#">Messages</a>
     <a href="#">Settings</a>
     <a href="logout.php">Logout</a>
   </div>
+  <nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container-fluid">
+      <span class="navbar-brand">Campus Event Management - Create event</span>
+    </div>
+  </nav>
   <!-- Main Dashboard Content -->
   <div class="main-content">
      <div class="container mt-5 mb-5">
@@ -86,8 +89,13 @@
       </div>
 
       <div class="mb-3">
-        <label for="date" class="form-label">Event Date</label>
+        <label for="date" class="form-label">Start Time</label>
         <input type="date" class="form-control" name="date" id="date" required>
+      </div>
+      <div class="mb-3">
+       <label for="date" class="form-label">End Time</label>
+        <input type="time" name="end_time"  class="form-control"required>
+
       </div>
 
       <div class="mb-3">

@@ -1,15 +1,30 @@
 <?php
 session_start();
+include("connections.php");
 
-// Check if admin is logged in
 if (!isset($_SESSION['email'])) {
-    // Not logged in, redirect to login page
     header("Location: login.php");
     exit();
 }
 
-// You can optionally fetch the user's name if it's stored in the session or DB
-$name = isset($_SESSION['name']) ? $_SESSION['name'] : 'Admin';
+$name = $_SESSION['name'] ?? 'Admin';
+
+// Get counts
+$total_users_result = $conn->query("SELECT COUNT(*) AS total_users FROM users");
+$total_events_result = $conn->query("SELECT COUNT(*) AS total_events FROM events");
+
+$total_users = $total_users_result->fetch_assoc()['total_users'];
+$total_events = $total_events_result->fetch_assoc()['total_events'];
+
+// Get recent 5 events
+$recent_events = $conn->query("
+    SELECT 
+        e.id, e.title, e.event_date, e.venue,
+        (SELECT COUNT(*) FROM attendance WHERE event_id = e.id) AS attendees
+    FROM events e
+    ORDER BY e.event_date DESC
+    LIMIT 5
+");
 ?>
 
 <!DOCTYPE html>
@@ -74,12 +89,10 @@ $name = isset($_SESSION['name']) ? $_SESSION['name'] : 'Admin';
   <!-- Sidebar Navigation -->
   <div class="sidebar">
     <h4 class="text-center mb-4">Admin Panel</h4>
-    <a href="dashboard.php">Dashboard</a>
-    <a href="manageuser.php" class="active">Manage users</a>
-    <a  href="#">Manage Events</a>
-    <a href="#">Registered Users</a>
+    <a href="dashboard.php" class="active">Dashboard</a>
+    <a href="manageuser.php" >Manage users</a>
+    <a  href="manageevent.php">Manage Events</a>
     <a href="createevent.html">Create Event</a>
-    <a href="#">Messages</a>
     <a href="#">Settings</a>
     <a href="logout.php">Logout</a>
   </div>
@@ -92,74 +105,65 @@ $name = isset($_SESSION['name']) ? $_SESSION['name'] : 'Admin';
   </nav>
 
   <!-- Main Dashboard Content -->
-  <div class="main-content">
-    <h3>Welcome, <?php echo htmlspecialchars($name); ?> 👋</h3>
-    <p class="text-muted">Here's an overview of the platform.</p>
+    <div class="main-content">
+  <h3>Welcome, <?php echo htmlspecialchars($name); ?> 👋</h3>
+  <p class="text-muted">Here's an overview of the platform.</p>
 
-    <div class="row g-4 mt-3">
-      <div class="col-md-4">
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <h5 class="card-title">Total Events</h5>
-            <p class="card-text display-6 fw-bold text-primary">12</p>
-          </div>
-        </div>
-      </div>
-      
-      <div class="col-md-4">
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <h5 class="card-title">Registered Users</h5>
-            <p class="card-text display-6 fw-bold text-success">125</p>
-          </div>
-        </div>
-      </div>
-      
-      <div class="col-md-4">
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <h5 class="card-title">Pending Messages</h5>
-            <p class="card-text display-6 fw-bold text-danger">3</p>
-          </div>
+  <div class="row g-4 mt-3">
+    <div class="col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">Total Events</h5>
+          <p class="card-text display-6 fw-bold text-primary"><?= $total_events ?></p>
         </div>
       </div>
     </div>
-
-    <!-- Example Table Section -->
-    <div class="mt-5">
-      <h5 class="mb-3">Recent Events</h5>
-      <div class="table-responsive">
-        <table class="table table-hover bg-white rounded shadow-sm">
-          <thead class="table-light">
-            <tr>
-              <th>Event Title</th>
-              <th>Date</th>
-              <th>Venue</th>
-              <th>Attendees</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Tech Conference 2025</td>
-              <td>May 25, 2025</td>
-              <td>Auditorium A</td>
-              <td>82</td>
-              <td><span class="badge bg-success">Active</span></td>
-            </tr>
-            <tr>
-              <td>Startup Pitch Day</td>
-              <td>June 10, 2025</td>
-              <td>Innovation Hall</td>
-              <td>56</td>
-              <td><span class="badge bg-warning text-dark">Upcoming</span></td>
-            </tr>
-            <!-- Add more dynamic rows as needed -->
-          </tbody>
-        </table>
+    
+    <div class="col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">Registered Users</h5>
+          <p class="card-text display-6 fw-bold text-success"><?= $total_users ?></p>
+        </div>
       </div>
+    </div>
+    
+  <!-- Recent Events Table -->
+  <div class="mt-5">
+    <h5 class="mb-3">Recent Events</h5>
+    <div class="table-responsive">
+      <table class="table table-hover bg-white rounded shadow-sm">
+        <thead class="table-light">
+          <tr>
+            <th>Event Title</th>
+            <th>Date</th>
+            <th>Venue</th>
+            <th>Attendees</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php while ($event = $recent_events->fetch_assoc()): ?>
+            <tr>
+              <td><?= htmlspecialchars($event['title']) ?></td>
+              <td><?= htmlspecialchars(date("M d, Y", strtotime($event['event_date']))) ?></td>
+              <td><?= htmlspecialchars($event['venue']) ?></td>
+              <td><?= $event['attendees'] ?></td>
+              <td>
+                <?php
+                  $status = (strtotime($event['event_date']) > time()) ? 'Upcoming' : 'Active';
+                  $badge = $status === 'Upcoming' ? 'warning text-dark' : 'success';
+                ?>
+                <span class="badge bg-<?= $badge ?>"><?= $status ?></span>
+              </td>
+            </tr>
+          <?php endwhile; ?>
+        </tbody>
+      </table>
     </div>
   </div>
+</div>
+
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
